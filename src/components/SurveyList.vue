@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div style="margin: 0 auto; width: 1192px;">
+    <div>
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <h2>问卷列表</h2>
       </div>
@@ -9,14 +9,15 @@
           <div>
             <h4 style="margin-top: 0;">{{item.title}}</h4>
             <div style="font-size: 12px; color: #666;">
-              <span style="margin-right: 48px;">创建时间： {{item.createdTime | formatDate}}</span>
               <span style="margin-right: 48px;">状态： {{item.status | status}}</span>
-              <span>回答数： {{item.answerCount}}</span>
+              <span style="margin-right: 48px;">回答数： {{item.answerCount}}</span>
+              <span style="margin-right: 48px;" v-if="item.publishedTime">发布时间： {{item.publishedTime | formatDate}}</span>
+              <span style="margin-right: 48px;" v-if="!item.publishedTime">发布时间： -</span>
             </div>
           </div>
           <div>
-            <el-button type="success">查看详情</el-button>
-            <el-button type="primary">发布</el-button>
+            <el-button type="success" @click="$router.push(`/survey/${item.id}/answers`)">查看详情</el-button>
+            <el-button v-if="item.status !== 'published'" type="primary" @click="publish(item.id)">发布</el-button>
             <el-button type="danger">删除</el-button>
           </div>
         </div>
@@ -46,9 +47,17 @@ export default {
     }
   },
   methods: {
+    publish (id) {
+      axios.get(`/survey/publish?id=${id}`).then(res => {
+        this.$message.success('发布成功')
+        this.getSurveyList()
+      }).catch(() => {
+        this.$message.error('发布失败')
+      })
+    },
     getSurveyList () {
       axios.get('/survey/search?pageNum=1&pageSize=20000').then(res => {
-        this.list = res.data.results.concat(res.data.results, res.data.results)
+        this.list = res.data.results
       })
     }
   },
