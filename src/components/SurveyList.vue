@@ -11,13 +11,21 @@
             <div style="font-size: 12px; color: #666;">
               <span style="margin-right: 48px;">状态： {{item.status | status}}</span>
               <span style="margin-right: 48px;">回答数： {{item.answerCount}}</span>
-              <span style="margin-right: 48px;" v-if="item.publishedTime">发布时间： {{item.publishedTime | formatDate}}</span>
+              <span
+                style="margin-right: 48px;"
+                v-if="item.publishedTime"
+              >发布时间： {{item.publishedTime | formatDate}}</span>
               <span style="margin-right: 48px;" v-if="!item.publishedTime">发布时间： -</span>
             </div>
           </div>
           <div>
+            <el-button type="primary" @click="downloadXlsx(item)">下载结果</el-button>
             <el-button type="success" @click="$router.push(`/survey/${item.id}/answers`)">查看详情</el-button>
-            <el-button v-if="item.status !== 'published'" type="primary" @click="publish(item.id)">发布</el-button>
+            <el-button
+              v-if="item.status !== 'published'"
+              type="primary"
+              @click="publish(item.id)"
+            >发布</el-button>
             <el-button type="danger">删除</el-button>
           </div>
         </div>
@@ -26,43 +34,49 @@
   </div>
 </template>
 <script>
-import axios from 'axios'
-import * as moment from 'moment'
+import axios from "axios";
+import * as moment from "moment";
 export default {
-  data () {
+  data() {
     return {
       list: []
-    }
+    };
   },
   filters: {
-    status (val) {
-      if (val === 'published') {
-        return '已发布'
+    status(val) {
+      if (val === "published") {
+        return "已发布";
       } else {
-        return '待发布'
+        return "待发布";
       }
     },
-    formatDate (val) {
-      return moment(val).format('YYYY-MM-DD HH:mm:ss')
+    formatDate(val) {
+      return moment(val).format("YYYY-MM-DD HH:mm:ss");
     }
   },
   methods: {
-    publish (id) {
-      axios.get(`/survey/publish?id=${id}`).then(res => {
-        this.$message.success('发布成功')
-        this.getSurveyList()
-      }).catch(() => {
-        this.$message.error('发布失败')
-      })
+    download(item) {
+      window.open(`/answer/download?questionId=${item.id}`);
     },
-    getSurveyList () {
-      axios.get('/survey/search?pageNum=1&pageSize=20000').then(res => {
-        this.list = res.data.results
-      })
+    publish(id) {
+      axios
+        .get(`/survey/publish?id=${id}`)
+        .then(res => {
+          this.$message.success("发布成功");
+          this.getSurveyList();
+        })
+        .catch(() => {
+          this.$message.error("发布失败");
+        });
+    },
+    getSurveyList() {
+      axios.get("/survey/search?pageNum=1&pageSize=20000").then(res => {
+        this.list = res.data.results;
+      });
     }
   },
-  mounted () {
-    this.getSurveyList()
+  mounted() {
+    this.getSurveyList();
   }
-}
+};
 </script>
