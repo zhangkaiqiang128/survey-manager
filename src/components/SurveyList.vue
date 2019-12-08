@@ -55,7 +55,7 @@ export default {
     }
   },
   methods: {
-    download(item) {
+    downloadXlsx(item) {
       window.open(`/answer/download?questionId=${item.id}`);
     },
     publish(id) {
